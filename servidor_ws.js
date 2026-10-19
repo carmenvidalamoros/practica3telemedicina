@@ -1,6 +1,14 @@
 // Servidor WebSocket para el sistema de avisos en tiempo real
 const { WebSocketServer } = require('ws');
-var conexionBD = require('./conexion_mysql.js'); // conexión a la base de datos
+
+// 1. Importar el cliente de Supabase
+const { createClient } = require('@supabase/supabase-js');
+
+// 2. Configurar con tu URL y tu Public Key (anon key)
+const supabaseUrl = 'https://peclxhvzidsmpsnbarga.supabase.co';
+const supabaseKey = 'sb_publishable_lMijzYYBb4i-UmiEuvjxKQ_dZqfMwws'; // <--- Pega aquí tu public key
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 
 // Crear el servidor WebSocket en el puerto 3502
 const wss = new WebSocketServer({ port: 3502 });
