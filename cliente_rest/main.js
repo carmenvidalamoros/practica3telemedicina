@@ -530,7 +530,20 @@ function comprobarReservaValida(datos, id_area){
   var valida = false;
   // comprueba el area primero y si es correcta comprobará los datos
   if (id_area && id_area>0 && id_area<19){
-    if (datos && datos.nombre && datos.apellidos && datos.categoría && datos.fec_pet && datos.horas_estimadas){
+    if ( typeof reserva.nombre !== "string" &&
+                    !reserva.nombre.trim() &&
+                    typeof reserva.apellidos !== "string" &&
+                    !reserva.apellidos.trim() &&
+                    typeof categoria !== "string" &&
+                    !categoria.trim() &&
+                    typeof reserva.fec_pet !== "string" &&
+                    !reserva.fec_pet.trim() &&
+                    reserva.horas_estimadas == null &&
+                    !Number.isFinite(Number(reserva.horas_estimadas)) &&
+                    Number(reserva.horas_estimadas) <= 0 &&
+                    !reserva.fec_pet.includes(":") &&  // Comprobar que las fechas tengan hora
+                    (reserva.fec_ini != null && !String(reserva.fec_ini).includes(":")) &&
+                    (reserva.fecha_fin != null && !String(reserva.fecha_fin).includes(":"))){
     valida = true;
   }
   } 
