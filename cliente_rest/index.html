@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SD - Gestión de Recursos Hospitalarios</title>
+    <link rel="stylesheet" href="estilos.css">
+    <script src="rest.js"></script> 
+    <script src="main.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1>Aplicación Gestor</h1>
+    </header>
+
+    <main id="contenedor-principal">
+        
+        <!-- VISTA LOGIN -->
+        <section id="vista-login" class="vista">
+            <div class="card">
+                <h2>ACCESO</h2>
+                <div class="campo">
+                    <label for="login-usuario">Usuario:</label>
+                    <input type="text" id="login-usuario">
+                </div>
+                <div class="campo">
+                    <label for="login-password">Contraseña:</label>
+                    <input type="password" id="login-password">
+                </div>
+                <div class="acciones">
+                    <button onclick="login()" id="btn-entrar" class="btn-primario">Entrar</button>
+                    <button onclick="prepararRegistro(true); navegar('vista-registro');" id="btn-ir-registro" class="btn-secundario">Registrarse</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA REGISTRO / EDICIÓN -->
+        <section id="vista-registro" class="vista oculto">
+            <div class="card">
+                <h2 id="titulo-registro">DATOS GESTOR</h2>
+                <div class="campo">
+                    <label for="reg-nombre">Nombre:</label>
+                    <input type="text" id="reg-nombre">
+                </div>
+                <div class="campo">
+                    <label for="reg-apellidos">Apellidos:</label>
+                    <input type="text" id="reg-apellidos">
+                </div>
+                <div class="campo">
+                    <label for="reg-login">Login:</label>
+                    <input type="text" id="reg-login">
+                </div>
+                <div class="campo">
+                    <label for="reg-password">Contraseña:</label>
+                    <input type="password" id="reg-password">
+                </div>
+                <div class="acciones">
+                    <button onclick="guardarGestor()" id="btn-guardar-gestor" class="btn-primario">Guardar</button>
+                    <button onclick="cancelarRegistro()" id="btn-cancelar-registro" class="btn-secundario">Cancelar</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA INICIO -->
+        <section id="vista-inicio" class="vista oculto">
+            <div class="usuario-info">
+                <span>Bienvenido <strong id="nombre-usuario-saludo"></strong></span>
+                <button onclick="prepararRegistro(false); navegar('vista-registro');" id="btn-editar-perfil" class="btn-pequeno">Editar datos</button>
+            </div>
+
+            <h2>INICIO</h2>
+            <!-- Vista Principal: Ranking de uso por Área Médica -->
+                <div id="seccion-ranking">
+                <h3>Ranking de Uso por Especialidad Médica</h3>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>Especialidad</th>
+                            <th>Reservas Totales</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-ranking">
+                        <!-- Las filas se insertan automáticamente desde JavaScript -->
+                    </tbody>
+                </table>
+                <button onclick="enviarDatosAlMinisterio()">Enviar Reservas al Ministerio</button>
+                </div>
+                
+            <fieldset class="busqueda">
+                <legend>Búsqueda de recursos</legend>
+                <div class="filtros">
+                    <div class="campo">
+                        <label for="filtro-categoria">Categoría:</label>
+                        <select id="filtro-categoria"></select>
+                    </div>
+                    <div class="campo">
+                        <label for="filtro-modelo">Modelo:</label>
+                        <select id="filtro-modelo"></select>
+                    </div>
+                    <div class="campo">
+                        <label for="filtro-ubicacion">Ubicación:</label>
+                        <select id="filtro-ubicacion"></select>
+                    </div>
+                    <div class="campo">
+                        <label for="filtro-estado">Estado:</label>
+                        <select id="filtro-estado">
+                            <option value="Todos">Todos</option>
+                            <option value="0">Operativo</option>
+                            <option value="1">Baja/Defectuoso</option>
+                            <option value="2">Mantenimiento</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="cargarListadoRecursos()" id="btn-buscar" class="btn-primario">Buscar</button>
+            </fieldset>
+
+            <h3>Recursos</h3>
+            <div class="table-container tabla-contenedor">
+                <table id="tabla-recursos">
+                    <thead>
+                        <tr>
+                            <th>N. Serie</th>
+                            <th>Categoría</th>
+                            <th>Modelo</th>
+                            <th>Ubicación</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="pie-inicio">
+                <button onclick="prepararFichaRecurso(null)" id="btn-nuevo-recurso" class="btn-primario">Añadir Recurso</button>
+                <button onclick="salirDeInicio()" id="btn-salir" class="btn-secundario">Salir</button>
+            </div>
+
+            <h3>Avisos</h3>
+            <div class="table-container tabla-contenedor">
+                <table id="tabla-avisos">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Origen</th>
+                            <th>Texto</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- VISTA DETALLE RECURSO -->
+        <section id="vista-recurso" class="vista oculto">
+            <h2>RECURSO</h2>
+            <div class="card">
+                <h3>Datos recurso</h3>
+                <div class="campo">
+                    <label for="rec-categoria">Categoría:</label>
+                    <select id="rec-categoria"></select>
+                </div>
+                <div class="campo">
+                    <label for="rec-modelo">Modelo:</label>
+                    <select id="rec-modelo"></select>
+                </div>
+                <div class="campo">
+                    <label for="rec-serie">Núm. Serie:</label>
+                    <input type="text" id="rec-serie">
+                </div>
+                <div class="campo">
+                    <label for="rec-ubicacion">Ubicación:</label>
+                    <select id="rec-ubicacion"></select>
+                </div>
+                <div class="campo">
+                    <label for="rec-estado">Estado:</label>
+                    <select id="rec-estado">
+                        <option value="0">Operativo</option>
+                        <option value="1">Baja o defectuoso</option>
+                        <option value="2">En mantenimiento</option>
+                    </select>
+                </div>
+                <button onclick="guardarRecurso()" id="btn-guardar-recurso" class="btn-primario">Guardar</button>
+            </div>
+
+            <div class="detalles-listas">
+                <h3>Reservas</h3>
+                <div class="table-container tabla-contenedor">
+                    <table id="tabla-reservas">
+                        <thead>
+                            <tr>
+                                <th>Sanitario</th>
+                                <th>H. estim.</th>
+                                <th>F. Petición</th>
+                                <th>F. Inicio</th>
+                                <th>F. Fin</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <h3>Reseñas</h3>
+                <div class="table-container tabla-contenedor">
+                    <table id="tabla-resenyas">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Sanitario</th>
+                                <th>Valoración</th>
+                                <th>Comentario</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <button onclick="navegar('vista-inicio')" id="btn-volver-listado" class="btn-secundario">Volver al listado</button>
+        </section>
+
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,327 @@
+/* ==========================================================================
+   1. CONFIGURACIÓN GENERAL Y RESET RESPONSIVO
+   ========================================================================== */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    background-color: #f4f4f4;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden; /* Elimina cualquier scroll horizontal global */
+}
+
+header {
+    background-color: #999;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+}
+
+#contenedor-principal {
+    max-width: 900px;
+    width: 95%;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-radius: 6px;
+}
+
+/* ==========================================================================
+   2. CONTROL DE VISTAS (SPA)
+   ========================================================================== */
+
+.vista {
+    display: block;
+}
+
+.oculto {
+    display: none !important;
+}
+
+/* ==========================================================================
+   3. FORMULARIOS, TARJETAS Y CAMPOS
+   ========================================================================== */
+
+.card {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    background-color: #fff;
+}
+
+.campo {
+    margin-bottom: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.campo label {
+    width: 110px;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+input, select {
+    padding: 6px 10px;
+    width: 100%;
+    max-width: 250px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   4. BOTONES
+   ========================================================================== */
+
+button {
+    cursor: pointer;
+    padding: 8px 15px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.btn-primario {
+    background-color: #e1e1e1;
+    border: 1px solid #999;
+}
+
+.btn-primario:hover {
+    background-color: #d0d0d0;
+}
+
+.btn-secundario {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+}
+
+.btn-secundario:hover {
+    background-color: #eee;
+}
+
+.btn-pequeno {
+    padding: 3px 8px;
+    font-size: 0.8em;
+}
+
+.acciones {
+    margin-top: 15px;
+}
+
+/* ==========================================================================
+   5. TABLAS ESCRITORIO (ESTÁNDAR)
+   ========================================================================== */
+
+.tabla-contenedor,
+.table-container {
+    margin: 15px 0;
+    width: 100%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+    font-size: 0.88em;
+}
+
+th {
+    background-color: #eee;
+    font-weight: bold;
+}
+
+/* Colores de Estado de Reservas */
+.reserva-finalizada { background-color: #ffffff; } /* Blanco */
+.reserva-en-uso { background-color: #cce5ff; }    /* Azul */
+.reserva-retraso { background-color: #f8d7da; }   /* Rojo */
+.reserva-pendiente { background-color: #d4edda; } /* Verde */
+
+/* ==========================================================================
+   6. LAYOUT BÚSQUEDA E INICIO
+   ========================================================================== */
+
+.usuario-info {
+    text-align: right;
+    margin-bottom: 15px;
+}
+
+.busqueda {
+    border: 1px solid #999;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.filtros {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.filtros .campo {
+    margin-bottom: 0;
+}
+
+.filtros .campo label {
+    width: 80px;
+}
+
+.filtros .campo select,
+.filtros .campo input {
+    max-width: 100%;
+}
+
+.pie-inicio {
+    margin: 15px 0;
+}
+
+/* ==========================================================================
+   7. TRANSFORMACIÓN A TARJETAS PARA MÓVILES (<= 768px)
+   ========================================================================== */
+
+@media screen and (max-width: 768px) {
+    #contenedor-principal {
+        padding: 10px;
+        width: 100%;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .campo {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .campo label {
+        width: 100%;
+        margin-bottom: 3px;
+    }
+
+    input, select {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .usuario-info {
+        text-align: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* --- CONVERSIÓN DE TABLA A TARJETAS EN MÓVIL --- */
+
+    table, thead, tbody, th, td, tr {
+        display: block;
+        width: 100%;
+    }
+
+    /* Ocultar la cabecera original */
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    /* Cada fila se convierte en una Tarjeta */
+    tbody tr {
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    }
+
+    /* Celdas distribuidas tipo Clave: Valor */
+    td {
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 4px;
+        text-align: right;
+        font-size: 0.85rem;
+    }
+
+    td:last-child {
+        border-bottom: none;
+        margin-top: 5px;
+    }
+
+    td button {
+        width: auto;
+        margin: 2px;
+    }
+
+    /* Título de la columna (a la izquierda de cada celda) */
+    td::before {
+        font-weight: bold;
+        color: #444;
+        text-align: left;
+        padding-right: 10px;
+    }
+
+    /* --- INSERCIÓN DE ETIQUETAS SEGÚN CADA TABLA --- */
+
+    /* Tabla Recursos */
+    #tabla-recursos td:nth-child(1)::before { content: "N. Serie:"; }
+    #tabla-recursos td:nth-child(2)::before { content: "Categoría:"; }
+    #tabla-recursos td:nth-child(3)::before { content: "Modelo:"; }
+    #tabla-recursos td:nth-child(4)::before { content: "Ubicación:"; }
+    #tabla-recursos td:nth-child(5)::before { content: "Estado:"; }
+    #tabla-recursos td:nth-child(6)::before { content: "Acciones:"; }
+
+    /* Tabla Reservas Pendientes */
+    #tabla-reservas-pendientes td:nth-child(1)::before { content: "Categoría:"; }
+    #tabla-reservas-pendientes td:nth-child(2)::before { content: "Modelo:"; }
+    #tabla-reservas-pendientes td:nth-child(3)::before { content: "N. Serie:"; }
+    #tabla-reservas-pendientes td:nth-child(4)::before { content: "Ubicación:"; }
+    #tabla-reservas-pendientes td:nth-child(5)::before { content: "F. Petición:"; }
+    #tabla-reservas-pendientes td:nth-child(6)::before { content: "H. restantes:"; }
+
+    /* Tabla Reservas Realizadas */
+    #tabla-reservas-realizadas td:nth-child(1)::before { content: "Categoría:"; }
+    #tabla-reservas-realizadas td:nth-child(2)::before { content: "Modelo:"; }
+    #tabla-reservas-realizadas td:nth-child(3)::before { content: "N. Serie:"; }
+    #tabla-reservas-realizadas td:nth-child(4)::before { content: "H. estimadas:"; }
+    #tabla-reservas-realizadas td:nth-child(5)::before { content: "F. Inicio:"; }
+    #tabla-reservas-realizadas td:nth-child(6)::before { content: "F. Fin:"; }
+
+    /* Tabla Avisos */
+    #tabla-avisos td:nth-child(1)::before { content: "Fecha:"; }
+    #tabla-avisos td:nth-child(2)::before { content: "Origen:"; }
+    #tabla-avisos td:nth-child(3)::before { content: "Texto:"; }
+
+    /* Tabla Reservas en Ficha */
+    #tabla-reservas td:nth-child(1)::before { content: "Dato 1:"; }
+    #tabla-reservas td:nth-child(2)::before { content: "Dato 2:"; }
+    #tabla-reservas td:nth-child(3)::before { content: "Dato 3:"; }
+    #tabla-reservas td:nth-child(4)::before { content: "Dato 4:"; }
+    #tabla-reservas td:nth-child(5)::before { content: "Acciones:"; }
+
+    /* Tabla Reseñas */
+    #tabla-resenyas td:nth-child(1)::before { content: "Fecha:"; }
+    #tabla-resenyas td:nth-child(2)::before { content: "Sanitario:"; }
+    #tabla-resenyas td:nth-child(3)::before { content: "Valoración:"; }
+    #tabla-resenyas td:nth-child(4)::before { content: "Comentario:"; }
+}
