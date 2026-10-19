@@ -2,6 +2,7 @@ const path = require('path');
 
 var express = require("express");
 var app = express();
+app.use(express.json()); 
 
 // 1. Importar el cliente de Supabase
 const { createClient } = require('@supabase/supabase-js');
@@ -10,8 +11,6 @@ const { createClient } = require('@supabase/supabase-js');
 const supabaseUrl = 'https://peclxhvzidsmpsnbarga.supabase.co';
 const supabaseKey = 'sb_publishable_lMijzYYBb4i-UmiEuvjxKQ_dZqfMwws'; // <--- Pega aquí tu public key
 const supabase = createClient(supabaseUrl, supabaseKey);
-
-app.use(express.json()); 
 
 // JWT
 var jwt = require('jwt-simple');
