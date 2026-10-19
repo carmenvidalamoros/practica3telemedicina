@@ -577,6 +577,7 @@ function cargarReservasMinisterio() {
 function rellenarTabla(conteoPorArea){
   // 1. Transformar el objeto en un array de especialidades con sus nombres
   var listaRanking = [];
+  var posicion = 0;
 
   // Recorremos directamente los números de área del 1 al 18
   for (var i = 1; i <= 18; i++) {
@@ -598,7 +599,9 @@ function rellenarTabla(conteoPorArea){
     tbody.innerHTML = ""; // Limpiar contenido antiguo si lo hubiera
 
     for (var i = 0; i < listaRanking.length; i++) {
+      posicion ++;
       var fila = "<tr>" +
+        "<td>" + posicion + "</td>" +
         "<td>" + listaRanking[i].nombre_area + "</td>" +
         "<td>" + listaRanking[i].total + "</td>" +
         "</tr>";
