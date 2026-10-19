@@ -6,12 +6,12 @@ const { createClient } = require('@supabase/supabase-js');
 
 // 2. Configurar con tu URL y tu Public Key (anon key)
 const supabaseUrl = 'https://peclxhvzidsmpsnbarga.supabase.co';
-const supabaseKey = 'sb_publishable_lMijzYYBb4i-UmiEuvjxKQ_dZqfMwws'; // <--- Pega aquí tu public key
+const supabaseKey = 'sb_publishable_lMijzYYBb4i-UmiEuvjxKQ_dZqfMwws';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-
-// Crear el servidor WebSocket en el puerto 3502
-const wss = new WebSocketServer({ port: 3502 });
+// Puerto dinámico para Render o 3502 por defecto en local
+const PORT = process.env.PORT || 3502;
+const wss = new WebSocketServer({ port: PORT });
 
 // Cada cliente conectado tendrá guardado:
 // ws.tipo -> tipo del mensaje
@@ -22,14 +22,18 @@ wss.on('connection', function(ws) {
     console.log('Nuevo cliente WebSocket conectado');
 
     // Cuando llega un mensaje de un cliente
-    ws.on('message', function(mensaje) {
-        // Los mensajes viajan como texto JSON, hay que parsearlos
-        var datos_msg = JSON.parse(mensaje);
+    ws.on('message', async function(mensaje) {
+        let datos_msg;
+        try {
+            datos_msg = JSON.parse(mensaje);
+        } catch (e) {
+            console.error('Error al decodificar mensaje JSON:', e);
+            return;
+        }
+
         var tipo = datos_msg.tipo;
 
         // ── REGISTRO ──────────────────────────────────────────────────
-        // El cliente se identifica nada más conectarse (tras el login)
-        // Ejemplo de mensaje: { tipo: "registro", rol: "sanitario", id: 1 }
         if (tipo === 'registro') {
             ws.rol = datos_msg.rol;  // "sanitario" o "gestor"
             ws.id  = datos_msg.id;
@@ -37,8 +41,6 @@ wss.on('connection', function(ws) {
         }
 
         // ── AVISO ROJO: reserva iniciada o finalizada ─────────────────
-        // Lo envía el SANITARIO cuando inicia o finaliza una reserva
-        // Destinatarios: sanitarios que tengan reserva activa del mismo recurso
         else if (tipo === 'aviso_reserva') {
             var idRecurso = datos_msg.idRecurso;
             var texto = 'SE HA ' + datos_msg.accion + ' LA RESERVA DEL ' +
@@ -46,42 +48,42 @@ wss.on('connection', function(ws) {
                         datos_msg.nombreModelo.toUpperCase() + ' CON CÓDIGO ' +
                         datos_msg.numSerie;
 
-            // Buscar qué sanitarios tienen reserva activa (no finalizada) de ese recurso
-            conexionBD.query("SELECT sanitario FROM reservas WHERE fecha_inicio IS NOT NULL AND fecha_fin IS NULL AND recurso = " + idRecurso, function(err, reservas){
-                if (err){
-                    console.log("Error al consultar reservas activas en BD:", err);
-                    return;
+            // Consultar con Supabase las reservas activas del recurso
+            const { data: reservas, error: err } = await supabase
+                .from('reservas')
+                .select('sanitario')
+                .not('fecha_inicio', 'is', null)
+                .is('fecha_fin', null)
+                .eq('recurso', idRecurso);
+
+            if (err) {
+                console.log("Error al consultar reservas activas en Supabase:", err);
+                return;
+            }
+
+            // Extraer los IDs de los sanitarios afectados
+            var sanitariosAfectados = (reservas || []).map(r => r.sanitario);
+
+            // Preparar el aviso en formato JSON
+            var avisoRojo = JSON.stringify({
+                color:  'rojo',
+                fecha:  new Date().toLocaleString('es-ES'),
+                origen: datos_msg.origen,
+                texto:  texto
+            });
+
+            // Enviar el aviso SOLO a los sanitarios conectados afectados
+            wss.clients.forEach(function(cliente) {
+                if (cliente.rol === 'sanitario' &&
+                    cliente.id != datos_msg.idSanitario &&
+                    sanitariosAfectados.includes(cliente.id) &&
+                    cliente.readyState === 1) {  // 1 = OPEN
+                    cliente.send(avisoRojo);
                 }
-
-                // Extraer los IDs de los sanitarios afectados
-                var sanitariosAfectados = [];
-                for (var i = 0; i < reservas.length; i++) {
-                    sanitariosAfectados.push(reservas[i].sanitario);
-                }
-
-                // Preparar el aviso en formato JSON
-                var avisoRojo = JSON.stringify({
-                    color:  'rojo',
-                    fecha:  new Date().toLocaleString('es-ES'),
-                    origen: datos_msg.origen,
-                    texto:  texto
-                });
-
-                // Enviar el aviso SOLO a los sanitarios conectados afectados
-                wss.clients.forEach(function(cliente) {
-                    if (cliente.rol === 'sanitario' &&
-                        cliente.id != datos_msg.idSanitario &&
-                        sanitariosAfectados.includes(cliente.id) &&
-                        cliente.readyState === 1) {  // 1 = OPEN
-                        cliente.send(avisoRojo);
-                    }
-                });
             });
         }
 
         // ── AVISO AZUL: nuevo recurso creado ──────────────────────────
-        // Lo envía el GESTOR cuando crea un recurso nuevo
-        // Destinatarios: TODOS los sanitarios conectados
         else if (tipo === 'aviso_recurso') {
             var texto = 'SE HA CREADO UN NUEVO RECURSO ' +
                         datos_msg.nombreCategoria.toUpperCase() + ' MODELO ' +
@@ -104,8 +106,6 @@ wss.on('connection', function(ws) {
         }
 
         // ── AVISO VERDE: nueva reseña creada ──────────────────────────
-        // Lo envía el SANITARIO cuando escribe una reseña
-        // Destinatarios: TODOS los gestores conectados
         else if (tipo === 'aviso_resenya') {
             var texto = 'SE HA CREADO UNA RESEÑA PARA EL ' +
                         datos_msg.nombreCategoria.toUpperCase() + ' MODELO ' +
@@ -137,6 +137,6 @@ wss.on('connection', function(ws) {
     });
 });
 
-console.log('Servidor WebSocket escuchando en ws://localhost:3502');
+console.log(`Servidor WebSocket escuchando en el puerto ${PORT}`);
 
 module.exports = wss;
