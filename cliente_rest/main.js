@@ -545,6 +545,41 @@ function comprobarReservaValida(datos, id_area){
   return valida
 }
 
+function consultarMinisterio(){
+  var nombre = document.getElementById("nombre-reserva").value;
+  var apellidos = document.getElementById("apellidos-reserva").value;
+  var contador = 0;
+
+  fetch("https://undefined.ua.es/telemedicina/api/datos")
+    .then(function (respuesta) {
+      return respuesta.json();
+    })
+    .then(function (datosMinisterio) {
+      if (datosMinisterio && datosMinisterio.length){ //si no está vacío, recorro las diferentes reservas y 
+        // recorre todas las reservas
+        for (var i = 0; i < datosMinisterio.length; i++){
+
+          var bloqueReservas =  datosMinisterio[i].datos;
+          var id_area = datosMinisterio[i].id_area; //solo para comporbar si es correcta
+
+          for (var j = 0; j < bloqueReservas.length; j++){
+            // para cada reserva comprobar si sus parámetros son válidos.Si valida = true, aumenta ya el contador del área correspondiente
+            if (comprobarReservaValida(bloqueReservas[j], id_area) && bloqueReservas[j].nombre == nombre && bloqueReservas[j].apellidos == apellidos){
+              contador ++;
+            }
+          }  
+        }
+        alert("Número de reservas total = " + contador);
+
+      } else {
+        alert("No se han obtenido los datos del servidor");
+      }
+    })
+    .catch(function (error) {
+      console.log("Error al conectar con el Ministerio:", error);
+    });
+}
+
 // GET para obtener los datos del ministerio, limpiarlos y enseñarlos en la tabla
 function cargarReservasMinisterio() {
   // se hace un array con cada area de la 1 a la 18 y se le asigna un contador a 0: {1:0, 2:0, ...}
