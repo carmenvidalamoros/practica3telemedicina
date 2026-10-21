@@ -586,6 +586,42 @@ function consultarRegistrosMinisterio(){
     });
 }
 
+// EJERCICIO 2 EXAMEN
+function reservasFinalizadas(){
+  // el id de mi área es el 16
+  var contador = 0;
+  // hacemos una petición get al ministerio con fecth
+  // devuelve un json con los datos y si no lo consigue lanza un error
+  fetch("https://undefined.ua.es/telemedicina/api/datos")
+    .then(function (respuesta) {
+      return respuesta.json();
+    })
+    .then(function (datosMinisterio) {
+      console.log("Datos recibidos del Ministerio:", datosMinisterio);
+      if (datosMinisterio && datosMinisterio.length){ //si no está vacío, recorro las diferentes reservas y 
+        // recorre todas las reservas
+        for (var i = 0; i < datosMinisterio.length; i++){
+          // dividir los bloques del array: id_area, fecha y datos (nombre,apellidos...)
+          var id_area = datosMinisterio[i].id_area;
+          var todasLasReservas =  datosMinisterio[i].datos;
+          // si el área coincide, ya miro las reservas
+          if (id_area == 16){
+            for (var j = 0; j < todasLasReservas.length; j++){
+              var reserva = todasLasReservas[j];
+              if (typeof reserva.fecha_fin == "string" && reserva.fecha_fin.trim() != "" && !Number.isNaN(Date.parse(datos.fecha_fin)) ){
+                contador ++;
+              }
+            }
+          }
+        }
+        alert ("Existen " + contador + " reservas finalizadas");
+      } 
+    })
+    .catch(function (error) {
+      console.log("Error al conectar con el Ministerio:", error);
+    });
+}
+
 // GET para obtener los datos del ministerio, limpiarlos y enseñarlos en la tabla
 function cargarReservasMinisterio() {
   // se hace un array con cada area de la 1 a la 18 y se le asigna un contador a 0: {1:0, 2:0, ...}
