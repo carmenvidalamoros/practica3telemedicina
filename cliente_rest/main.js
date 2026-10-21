@@ -608,7 +608,7 @@ function reservasFinalizadas(){
           if (id_area == 16){
             for (var j = 0; j < todasLasReservas.length; j++){
               var reserva = todasLasReservas[j];
-              if (typeof reserva.fecha_fin == "string" && reserva.fecha_fin.trim() != "" && !Number.isNaN(Date.parse(datos.fecha_fin)) ){
+              if (typeof reserva.fecha_fin == "string" && reserva.fecha_fin.trim() != "" && !Number.isNaN(Date.parse(reserva.fecha_fin)) ){
                 contador ++;
               }
             }
