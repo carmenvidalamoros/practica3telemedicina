@@ -23,7 +23,7 @@ function api(metodo, url, body, callback) {
 // INICIALIZACIÓN AL CARGAR LA PÁGINA
 window.onload = function() {
   navegar("vista-login");
-  configurarEventos();
+  
 };
 
 // NAVEGACIÓN SPA
